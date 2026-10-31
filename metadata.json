@@ -1,0 +1,6 @@
+{
+  "name": "Dihadi Web",
+  "description": "Staff attendance and monthly salary management website. Daily attendance, attendance sheet, auto salary calculation, and payment records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

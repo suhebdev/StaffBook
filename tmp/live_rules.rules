@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function projectDoc(pid) { return get(/databases/$(database)/documents/projects/$(pid)); }
+    function isOwnerOf(pid) { return signedIn() && projectDoc(pid).data.ownerId == request.auth.uid; }
+    function isPublicProject(pid) { return projectDoc(pid).data.visibility == 'public'; }
+
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.uid == userId
+        && request.resource.data.keys().hasOnly([
+             'uid','displayName','email','emailVerified','photoURL',
+             'provider','createdAt','lastLoginAt','loginCount'
+           ]);
+
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.keys().hasOnly([
+             'uid','displayName','email','emailVerified','photoURL',
+             'provider','createdAt','lastLoginAt','loginCount'
+           ]);
+
+      allow delete: if false;
+    }
+
+    match /projects/{projectId} {
+      allow read: if resource.data.visibility == 'public'
+                  || (signedIn() && resource.data.ownerId == request.auth.uid);
+
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.visibility in ['public', 'private']
+        && request.resource.data.aspectRatio in ['9:16', '1:1', '4:5', '16:9']
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.keys().hasOnly([
+             'ownerId','ownerName','ownerPhotoURL','name','aspectRatio','visibility',
+             'createdAt','updatedAt','publishedAt','remixedFrom'
+           ]);
+
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['name','visibility','updatedAt','publishedAt','ownerName','ownerPhotoURL'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.visibility in ['public', 'private'];
+
+      allow delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+
+      match /content/{docId} {
+        allow read: if isPublicProject(projectId) || isOwnerOf(projectId);
+        allow write: if isOwnerOf(projectId);
+      }
+
+      match /messages/{messageId} {
+        allow read, write: if isOwnerOf(projectId);
+      }
+    }
+
+    match /{document=**} { allow read, write: if false; }
+  }
+}

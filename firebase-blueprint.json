@@ -1,0 +1,146 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile metadata",
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string",
+          "description": "Owner account email address"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Server timestamp of account creation"
+        }
+      },
+      "required": ["createdAt"]
+    },
+    "Employee": {
+      "title": "Employee",
+      "description": "Staff member profile, rates, and reminders",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Full name of the employee"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 20,
+          "description": "Optional phone number"
+        },
+        "joinedOn": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Date joined (YYYY-MM-DD)"
+        },
+        "leftOn": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Optional departure date (YYYY-MM-DD)"
+        },
+        "active": {
+          "type": "boolean",
+          "description": "Active status of employee"
+        },
+        "rates": {
+          "type": "array",
+          "description": "Historical wage rate schedule"
+        },
+        "reminder": {
+          "type": "object",
+          "description": "Payday reminder configuration"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["name", "joinedOn", "active", "rates", "reminder"]
+    },
+    "AttendanceDoc": {
+      "title": "AttendanceDoc",
+      "description": "Monthly daily attendance sheet for an employee",
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "description": "Target employee identifier"
+        },
+        "month": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "description": "Month in YYYY-MM format"
+        },
+        "days": {
+          "type": "object",
+          "description": "Map of day-of-month to status ('F', 'H', 'A')"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last update timestamp"
+        }
+      },
+      "required": ["employeeId", "month", "days"]
+    },
+    "Payment": {
+      "title": "Payment",
+      "description": "Monthly salary settlement record",
+      "type": "object",
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "description": "Target employee identifier"
+        },
+        "month": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}$",
+          "description": "Month in YYYY-MM format"
+        },
+        "amount": {
+          "type": "number",
+          "description": "Settled wage amount in INR"
+        },
+        "paidOn": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}$",
+          "description": "Payment settlement date (YYYY-MM-DD)"
+        },
+        "note": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Optional notes or payment mode"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp of payment recording"
+        }
+      },
+      "required": ["employeeId", "month", "amount", "paidOn"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "UserProfile" },
+      "description": "Owner profile document"
+    },
+    "/users/{userId}/employees/{employeeId}": {
+      "schema": { "$ref": "Employee" },
+      "description": "Employee profiles subcollection"
+    },
+    "/users/{userId}/attendance/{attendanceDocId}": {
+      "schema": { "$ref": "AttendanceDoc" },
+      "description": "Monthly attendance documents subcollection, keyed by employeeId_YYYY-MM"
+    },
+    "/users/{userId}/payments/{paymentDocId}": {
+      "schema": { "$ref": "Payment" },
+      "description": "Monthly payment records subcollection, keyed by employeeId_YYYY-MM"
+    }
+  }
+}

@@ -1,0 +1,128 @@
+@import "@fontsource-variable/inter";
+@import "tailwindcss";
+
+/* Class-based dark mode: <html class="dark"> is set by ThemeContext / the inline script in index.html */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    --bg-main: #F8F9FA;
+    --bg-secondary: #FFFFFF;
+    --bg-surface: #FFFFFF;
+    --bg-surface-hover: #F1F3F5;
+    --text-primary: #111827;
+    --text-secondary: #4B5563;
+    --text-tertiary: #6B7280;
+    --border-color: #E5E7EB;
+    --border-subtle: #F3F4F6;
+    --accent-coral: #B93A2B;
+    --accent-coral-hover: #9F2F22;
+    --accent-coral-text: #FFFFFF;
+    --status-full: #059669;
+    --status-half: #D97706;
+    --status-absent: #DC2626;
+    color-scheme: light;
+  }
+
+  :root.dark {
+    --bg-main: #0D0D0F;
+    --bg-secondary: #121416;
+    --bg-surface: #17191C;
+    --bg-surface-hover: #1F2226;
+    --text-primary: #F2F0EC;
+    --text-secondary: #92969D;
+    --text-tertiary: #60646C;
+    --border-color: #292B2F;
+    --border-subtle: #1F2226;
+    --accent-coral: #FF8278;
+    --accent-coral-hover: #FF958C;
+    --accent-coral-text: #0D0D0F;
+    --status-full: #34D399;
+    --status-half: #FBBF24;
+    --status-absent: #F87171;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter Variable', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  ::selection {
+    background-color: rgba(255, 130, 120, 0.25);
+    color: var(--text-primary);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-main);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-tertiary);
+  }
+}
+
+/* Subtle architectural dot / geometric grid helper */
+.bg-tech-grid {
+  background-image: radial-gradient(rgba(100, 116, 139, 0.16) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+:root.dark .bg-tech-grid {
+  background-image: radial-gradient(rgba(146, 150, 157, 0.08) 1px, transparent 1px);
+}
+
+/* Print Stylesheet for Salary Summary */
+@media print {
+  nav, aside, header, footer, button, .no-print, [role="navigation"] {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt;
+    padding: 0;
+    margin: 0;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .print-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+  }
+
+  th, td {
+    border: 1px solid #cbd5e1 !important;
+    padding: 6px 8px !important;
+    font-size: 9pt !important;
+    color: black !important;
+  }
+
+  th {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+  }
+}
